@@ -52,13 +52,16 @@ string(REPLACE ";" "${AWS_MODULE_DIR};" AWS_MODULE_PATH "${CMAKE_PREFIX_PATH}${A
 list(APPEND CMAKE_MODULE_PATH ${AWS_MODULE_PATH})
 
 if (BUILD_DEPS)
+    file(MAKE_DIRECTORY ../crt)
+    add_project_dependency(aws-c-common)
+
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../crt/aws-c-common/cmake")
     message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
     include(AwsFindPackage)
 
     set(IN_SOURCE_BUILD ON)
     set(BUILD_TESTING OFF)
-    add_project_dependency(aws-c-common)
+#    add_project_dependency(aws-c-common)
     if (UNIX AND NOT APPLE)
         add_project_dependency(s2n)
     endif()
