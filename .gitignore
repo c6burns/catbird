@@ -212,7 +212,7 @@ ExportedObj/
 .consulo/
 *.csproj
 *.unityproj
-*.sln
+#*.sln # um, no lol :D
 *.suo
 *.tmp
 *.user
