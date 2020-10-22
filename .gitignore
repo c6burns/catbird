@@ -713,3 +713,5 @@ MigrationBackup/
 
 build/
 build_*/
+crt/
+deps/
