@@ -1,0 +1,2 @@
+-nologo
+-p:BannerTaskSkip=false
