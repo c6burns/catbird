@@ -6,6 +6,9 @@
     <PlatformTarget Condition="$(PlatformTarget) == ''">x64</PlatformTarget>
     <RootNamespace>Aws.CRT</RootNamespace>
 
+    <!-- project switches -->
+    <BannerTaskSkip Condition="$(BannerTaskSkip) == ''">true</BannerTaskSkip>
+
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>$(MSBuildThisFileDirectory)../packages</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
@@ -64,6 +67,12 @@
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
+
+  <!-- c6burns style: (noun) a distinctive appearance, typically featuring 80s consoles and/or text adventure games -->
+  <Import Project="$(CbSlnDir)MSBuild/BannerTask.targets" Condition="'$(BuildingInsideVisualStudio)' != 'true'" />
+  <Target Name="ConsoleBanner" Condition="'$(BuildingInsideVisualStudio)' != 'true'" BeforeTargets="BeforeBuild">
+    <BannerTask Condition="'$(BannerTaskSkip)' != 'true'" LineDelay="50" EndDelay="500" TextFile="$(CbSlnDir)MSBuild/Banner.txt"/>
+  </Target>
 
   <Target Name="MakeLocalPackageSource" BeforeTargets="Restore;CollectPackageReferences">
     <MakeDir Directories="$(SolutionDir)/packages" />
