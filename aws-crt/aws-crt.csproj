@@ -66,7 +66,7 @@
       Command="$(CMakeCmdConfig)"
       WorkingDirectory="$(CMakeBinaries)"
       ConsoleToMSBuild="true"
-      CustomWarningRegularExpression="(^Scanning|Built target)">
+      CustomWarningRegularExpression="([Ww]arning|Built target)">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
     <Message Text="CMake: Configure complete" Importance="high"/>
@@ -77,7 +77,7 @@
       Command="$(CMakeCmdBuild)"
       WorkingDirectory="$(CMakeBinaries)"
       ConsoleToMSBuild="true"
-      CustomWarningRegularExpression="(^Scanning|Built target)">
+      CustomWarningRegularExpression="([Ww]arning|Built target)">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
     <Message Text="CMake: Build complete" Importance="high"/>
