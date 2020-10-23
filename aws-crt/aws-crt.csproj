@@ -39,7 +39,7 @@
     <CMakeConfig Condition="$(CMakeConfig) == ''">RelWithDebInfo</CMakeConfig>
     <CMakeLibCrypto Condition="$(LibCryptoPath) != ''">-DLibCrypto_INCLUDE_DIR=$(LibCryptoPath)/include -DLibCrypto_STATIC_LIBRARY=$(LibCryptoPath)/lib/libcrypto.a</CMakeLibCrypto>
     <CMakeParallelCount Condition="$(CMakeParallelCount) == ''">$([System.Environment]::ProcessorCount)</CMakeParallelCount>
-    <CMakeParallelSwitch Condition="$(OS) == 'Windows_NT'">-parallel $(CMakeParallelCount)</CMakeParallelSwitch>
+    <CMakeParallelSwitch Condition="$(OS) == 'Windows_NT'">/nologo /maxcpucount</CMakeParallelSwitch>
     <CMakeParallelSwitch Condition="$(OS) != 'Windows_NT'">-j$(CMakeParallelCount)</CMakeParallelSwitch>
     <CMakeCmdConfig>cmake -G&quot;$(CMakeGenerator)&quot; -DCMAKE_BUILD_TYPE=$(CMakeConfig) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMakeArch) $(CMakeLibCrypto) $(ProjectDir)../native</CMakeCmdConfig>
     <CMakeCmdBuild>cmake --build . --config $(CMakeConfig) -- $(CMakeParallelSwitch)</CMakeCmdBuild>
@@ -62,14 +62,22 @@
     <Message Text="       Platform: $(OS) $(PlatformTarget)" Importance="high"/>
     <Message Text="      Generator: $(CMakeGenerator)" Importance="high"/>
     <Message Condition="$(OS) != 'Windows_NT'" Text="  Configuration: $(CMakeConfig)" Importance="high"/>
-    <Exec Command="$(CMakeCmdConfig)" WorkingDirectory="$(CMakeBinaries)" ConsoleToMSBuild="true" StandardOutputImportance="low" StandardErrorImportance="high">
+    <Exec
+      Command="$(CMakeCmdConfig)"
+      WorkingDirectory="$(CMakeBinaries)"
+      ConsoleToMSBuild="true"
+      CustomWarningRegularExpression="(^Scanning|Built target)">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
     <Message Text="CMake: Configure complete" Importance="high"/>
     <Message Text="" Importance="high"/>
 
     <Message Text="CMake: Building with $(CMakeParallelCount) parallel cores" Importance="high"/>
-    <Exec Command="$(CMakeCmdBuild)" WorkingDirectory="$(CMakeBinaries)" ConsoleToMSBuild="true" StandardOutputImportance="low" StandardErrorImportance="high">
+    <Exec
+      Command="$(CMakeCmdBuild)"
+      WorkingDirectory="$(CMakeBinaries)"
+      ConsoleToMSBuild="true"
+      CustomWarningRegularExpression="(^Scanning|Built target)">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
     <Message Text="CMake: Build complete" Importance="high"/>
