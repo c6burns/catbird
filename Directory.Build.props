@@ -9,12 +9,12 @@
         <CbPlatform Condition="$(CbPlatform) == '' AND $(OS) == 'Windows_NT'">WIN</CbPlatform>
         <CbPlatform Condition="$(CbPlatform) == '' AND $(OS) == 'Unix'">LIN</CbPlatform>
         <CbPlatform Condition="$(CbPlatform) == '' AND $(OS) == 'OSX'">OSX</CbPlatform>
-        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) == 'Windows_NT'">WINSOCK</CbSockApi>
-        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) == 'Unix'">POSIX</CbSockApi>
-        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) == 'OSX'">POSIX</CbSockApi>
+        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) != 'Windows_NT'">POSIX</CbSockApi>
+        <CbSockApi Condition="$(CbSockApi) == ''">WINSOCK</CbSockApi>
         <DefineConstants Condition="$(DefineConstants) != '' AND !$(DefineConstants.EndsWith(';'))">$(DefineConstants);</DefineConstants>
         <DefineConstants>$(DefineConstants)CB_PLATFORM_$(CbPlatform);CB_SOCKAPI_$(CbSockApi)</DefineConstants>
 
+        <CbPluginNativeBuild Condition="$(CbPluginNativeBuild) == ''">true</CbPluginNativeBuild>
         <CbPluginDir Condition="$(PluginDir) == ''">$(SlnDir)UnityProject/Assets/catbird/Plugins/</CbPluginDir>
         <CbPluginArchDir Condition="$(PluginArchDir) == ''">x86_64/</CbPluginArchDir>
         <CbPluginName Condition="$(PluginName) == ''">catbird</CbPluginName>
