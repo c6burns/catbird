@@ -15,15 +15,15 @@
         <DefineConstants Condition="$(DefineConstants) != '' AND !$(DefineConstants.EndsWith(';'))">$(DefineConstants);</DefineConstants>
         <DefineConstants>$(DefineConstants)CB_PLATFORM_$(CbPlatform);CB_SOCKAPI_$(CbSockApi)</DefineConstants>
 
-        <PluginDir Condition="$(PluginDir) == ''">$(SlnDir)UnityProject/Assets/catbird/Plugins/</PluginDir>
-        <PluginArchDir Condition="$(PluginArchDir) == ''">x86_64/</PluginArchDir>
-        <PluginName Condition="$(PluginName) == ''">catbird</PluginName>
-        <PluginPrefix Condition="$(PluginPrefix) == '' AND $(OS) != 'Windows_NT'">lib</PluginPrefix>
-        <PluginSuffix Condition="$(PluginExt) == '' AND $(OS) == 'Windows_NT'">.dll</PluginSuffix>
-        <PluginSuffix Condition="$(PluginExt) == '' AND $(OS) == 'Unix'">.so</PluginSuffix>
-        <PluginSuffix Condition="$(PluginExt) == '' AND $(OS) == 'OSX'">.dylib</PluginSuffix>
-        <PluginBinary Condition="$(PluginBinary) == ''">$(PluginPrefix)$(PluginName)$(PluginSuffix)</PluginBinary>
-        <PluginFullPath Condition="$(PluginPath) == ''">$(PluginDir)$(PluginArchDir)$(PluginBinary)</PluginFullPath>
+        <CbPluginDir Condition="$(PluginDir) == ''">$(SlnDir)UnityProject/Assets/catbird/Plugins/</CbPluginDir>
+        <CbPluginArchDir Condition="$(PluginArchDir) == ''">x86_64/</CbPluginArchDir>
+        <CbPluginName Condition="$(PluginName) == ''">catbird</CbPluginName>
+        <CbPluginPrefix Condition="$(PluginPrefix) == '' AND $(OS) != 'Windows_NT'">lib</CbPluginPrefix>
+        <CbPluginSuffix Condition="$(PluginExt) == '' AND $(OS) == 'Windows_NT'">.dll</CbPluginSuffix>
+        <CbPluginSuffix Condition="$(PluginExt) == '' AND $(OS) == 'Unix'">.so</CbPluginSuffix>
+        <CbPluginSuffix Condition="$(PluginExt) == '' AND $(OS) == 'OSX'">.dylib</CbPluginSuffix>
+        <CbPluginBinary Condition="$(PluginBinary) == ''">$(CbPluginPrefix)$(CbPluginName)$(CbPluginSuffix)</CbPluginBinary>
+        <CbPluginFullPath Condition="$(PluginPath) == ''">$(CbPluginDir)$(CbPluginArchDir)$(CbPluginBinary)</CbPluginFullPath>
     </PropertyGroup>
 
 </Project>
