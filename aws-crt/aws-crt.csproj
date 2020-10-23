@@ -42,7 +42,7 @@
     <CMakeParallelSwitch Condition="$(OS) == 'Windows_NT'">-parallel $(CMakeParallelCount)</CMakeParallelSwitch>
     <CMakeParallelSwitch Condition="$(OS) != 'Windows_NT'">-j$(CMakeParallelCount)</CMakeParallelSwitch>
     <CMakeCmdConfig>cmake -G&quot;$(CMakeGenerator)&quot; -DCMAKE_BUILD_TYPE=$(CMakeConfig) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMakeArch) $(CMakeLibCrypto) $(ProjectDir)../native</CMakeCmdConfig>
-    <CMakeCmdBuild>cmake --build . --config $(CMakeConfig) -- $(CMakeParallel)</CMakeCmdBuild>
+    <CMakeCmdBuild>cmake --build . --config $(CMakeConfig) -- $(CMakeParallelSwitch)</CMakeCmdBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CMake" Version="3.5.2" />
