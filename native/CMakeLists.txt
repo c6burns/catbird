@@ -1,16 +1,13 @@
 cmake_minimum_required(VERSION 3.1)
+project(catbird LANGUAGES C CXX)
 
-
-macro(add_project_dependency)
-    if(NOT EXISTS ${ARGV0})
-        execute_process(COMMAND git clone https://github.com/c6burns/${ARGV0} WORKING_DIRECTORY ../crt/)
-    endif()
-    add_subdirectory(../crt/${ARGV0} ${CMAKE_BINARY_DIR}/deps/${ARGV0})
-endmacro()
-
-
-project(aws-crt-dotnet C)
-option(BUILD_DEPS "Builds aws common runtime dependencies as part of build" ON)
+option(BUILD_DEPS "Builds runtime dependencies as part of this project's build" ON)
+option(BUILD_DEPS_AWS "Builds aws-c-* runtime dependencies as part of this project's build" ON)
+option(BUILD_DEPS_WX "Builds wxWidgets runtime dependencies as part of this project's build" ON)
+if (NOT BUILD_DEPS)
+    set(BUILD_DEPS_AWS OFF)
+    set(BUILD_DEPS_WX OFF)
+endif()
 
 if (POLICY CMP0069)
     cmake_policy(SET CMP0069 NEW) # Enable LTO/IPO if available in the compiler, see AwsCFlags
@@ -20,6 +17,13 @@ if (POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW) # Enable options to get their values from normal variables
 endif()
 
+macro(add_project_dependency)
+    if(NOT EXISTS ${ARGV0})
+        execute_process(COMMAND git clone https://github.com/c6burns/${ARGV0} WORKING_DIRECTORY ../deps/)
+    endif()
+    add_subdirectory(../deps/${ARGV0} ${CMAKE_BINARY_DIR}/deps/${ARGV0})
+endmacro()
+
 if (DEFINED CMAKE_PREFIX_PATH)
     file(TO_CMAKE_PATH ${CMAKE_PREFIX_PATH} CMAKE_PREFIX_PATH)
 endif()
@@ -27,7 +31,6 @@ endif()
 if (DEFINED CMAKE_INSTALL_PREFIX)
     file(TO_CMAKE_PATH ${CMAKE_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX)
 endif()
-
 
 if (UNIX AND NOT APPLE)
     include(GNUInstallDirs)
@@ -52,24 +55,39 @@ string(REPLACE ";" "${AWS_MODULE_DIR};" AWS_MODULE_PATH "${CMAKE_PREFIX_PATH}${A
 list(APPEND CMAKE_MODULE_PATH ${AWS_MODULE_PATH})
 
 if (BUILD_DEPS)
-    file(MAKE_DIRECTORY ../crt)
-    add_project_dependency(aws-c-common)
+    file(MAKE_DIRECTORY ../deps)
 
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../crt/aws-c-common/cmake")
-    message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
-    include(AwsFindPackage)
+    # build aws-c-* dependencies
+    if (BUILD_DEPS_AWS)
+        add_project_dependency(aws-c-common)
 
-    set(IN_SOURCE_BUILD ON)
-    set(BUILD_TESTING OFF)
-#    add_project_dependency(aws-c-common)
-    if (UNIX AND NOT APPLE)
-        add_project_dependency(s2n)
+        list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../deps/aws-c-common/cmake")
+        message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+        include(AwsFindPackage)
+
+        set(IN_SOURCE_BUILD ON)
+        set(BUILD_TESTING OFF)
+        if (UNIX AND NOT APPLE)
+            add_project_dependency(s2n)
+        endif()
+        add_project_dependency(aws-c-io)
+        add_project_dependency(aws-c-cal)
+        add_project_dependency(aws-c-compression)
+        add_project_dependency(aws-c-http)
+        add_project_dependency(aws-c-auth)
     endif()
-    add_project_dependency(aws-c-io)
-    add_project_dependency(aws-c-cal)
-    add_project_dependency(aws-c-compression)
-    add_project_dependency(aws-c-http)
-    add_project_dependency(aws-c-auth)
+
+    # build wxWidgets dependencies
+    if (BUILD_DEPS_WX)
+        option(wxBUILD_SHARED OFF)
+        option(wxBUILD_USE_STATIC_RUNTIME ON)
+        option(wxBUILD_MONOLITHIC ON)
+        option(wxUSE_NO_RTTI ON)
+        option(wxUSE_LIBSDL OFF)
+        option(wxUSE_STL OFF)
+        option(wxUSE_LIBLZMA OFF)
+        add_project_dependency(wxWidgets)
+    endif()
 else()
     include(AwsFindPackage)
     set(IN_SOURCE_BUILD OFF)
