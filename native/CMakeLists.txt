@@ -78,7 +78,7 @@ if (CB_BUILD_DEPS)
 
     # build aws-c-* dependencies
     if (CB_BUILD_DEPS_AWS)
-        #set(BUILD_TESTING OFF)
+        set(BUILD_TESTING OFF)
         #set(STATIC_CRT ON)
         set(BUILD_SHARED_LIBS OFF)
         cb_add_git_dependency(aws-c-common)
