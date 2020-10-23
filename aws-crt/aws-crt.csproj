@@ -25,25 +25,39 @@
     <RepositoryUrl>https://github.com/awslabs/aws-crt-dotnet.git</RepositoryUrl>
     <Copyright>Amazon Web Services</Copyright>
     <Description>AWS Common Runtime bindings for .NET</Description>
+  </PropertyGroup>
 
+  <PropertyGroup>
+    <CMakeBinaryDir Condition="$(CMakeBinaryDir) == ''">$(MSBuildThisFileDirectory)../build</CMakeBinaryDir>
+    <CMakeSourceDir Condition="$(CMakeSourceDir) == ''">$(MSBuildThisFileDirectory)../native</CMakeSourceDir>
+    <CMakeDepsDir Condition="$(CMakeDepsDir) == ''">$(MSBuildThisFileDirectory)../deps</CMakeDepsDir>
+    <CMakeBuildType Condition="$(CMakeBuildType) == '' AND $(Configuration) == 'Debug'">Debug</CMakeBuildType>
+    <CMakeBuildType Condition="$(CMakeBuildType) == ''">RelWithDebInfo</CMakeBuildType>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Windows_NT' AND $(PlatformTarget) == 'x64' AND $(VisualStudioVersion) == '14.0'">Visual Studio 14 2015 Win64</CMakeGenerator>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Windows_NT' AND $(PlatformTarget) == 'x64' AND $(VisualStudioVersion) == '15.0'">Visual Studio 15 2017 Win64</CMakeGenerator>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Windows_NT' AND $(PlatformTarget) == 'x64' AND $(VisualStudioVersion) == '16.0'">Visual Studio 16 2019</CMakeGenerator>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Windows_NT' AND $(PlatformTarget) == 'x86' AND $(VisualStudioVersion) == '14.0'">Visual Studio 14 2015</CMakeGenerator>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Windows_NT' AND $(PlatformTarget) == 'x86' AND $(VisualStudioVersion) == '15.0'">Visual Studio 15 2017</CMakeGenerator>
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Unix'">Unix Makefiles</CMakeGenerator>
-    <CMakeArch Condition="$(CMakeGenerator) == 'Visual Studio 16 2019'">-A x64</CMakeArch>
-    <CMakeBinaries Condition="$(OS) == 'Windows_NT'">c:/build-$(MSBuildProjectName)</CMakeBinaries>
-    <CMakeBinaries Condition="$(OS) != 'Windows_NT'">$(MSBuildThisFileDirectory)../build</CMakeBinaries>
-    <CMakeConfig Condition="$(Configuration) == 'Debug'">Debug</CMakeConfig>
-    <CMakeConfig Condition="$(CMakeConfig) == ''">RelWithDebInfo</CMakeConfig>
-    <CMakeLibCrypto Condition="$(LibCryptoPath) != ''">-DLibCrypto_INCLUDE_DIR=$(LibCryptoPath)/include -DLibCrypto_STATIC_LIBRARY=$(LibCryptoPath)/lib/libcrypto.a</CMakeLibCrypto>
-    <CMakeParallelCount Condition="$(CMakeParallelCount) == ''">$([System.Environment]::ProcessorCount)</CMakeParallelCount>
-    <CMakeParallelSwitch Condition="$(OS) == 'Windows_NT'">/nologo /maxcpucount</CMakeParallelSwitch>
-    <CMakeParallelSwitch Condition="$(OS) != 'Windows_NT'">-j$(CMakeParallelCount)</CMakeParallelSwitch>
-    <CMakeCmdConfig>cmake -G&quot;$(CMakeGenerator)&quot; -DCMAKE_BUILD_TYPE=$(CMakeConfig) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMakeArch) $(CMakeLibCrypto) $(MSBuildThisFileDirectory)../native</CMakeCmdConfig>
-    <CMakeCmdBuild>cmake --build . --config $(CMakeConfig) -- $(CMakeParallelSwitch)</CMakeCmdBuild>
+    <CMakeArchSwitch Condition="$(CMakeArchSwitch) == '' AND $(CMakeGenerator) == 'Visual Studio 16 2019'">-A x64</CMakeArchSwitch>
+    <CMakeLibCryptoSwitch Condition="$(CMakeLibCryptoSwitch) != ''">-DLibCrypto_INCLUDE_DIR=$(LibCryptoPath)/include -DLibCrypto_STATIC_LIBRARY=$(LibCryptoPath)/lib/libcrypto.a</CMakeLibCryptoSwitch>
+    <CMakeCoreCount Condition="$(CMakeCoreCount) == ''">$([System.Environment]::ProcessorCount)</CMakeCoreCount>
+    <CMakeConfigSwitches Condition="$(CMakeConfigSwitches) == ''">-DCMAKE_BUILD_TYPE=$(CMakeBuildType) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMakeArchSwitch) $(CMakeLibCryptoSwitch)</CMakeConfigSwitches>
+    <CMakeCommandConfig Condition="$(CMakeCommandConfig) == ''">cmake -G&quot;$(CMakeGenerator)&quot; $(CMakeConfigSwitches) $(CMakeSourceDir)</CMakeCommandConfig>
+    <CMakeCommandBuild Condition="$(CMakeCommandBuild) == ''">cmake --build $(CMakeBinaryDir) --config $(CMakeBuildType) -j $(CMakeCoreCount)</CMakeCommandBuild>
+    <CMakeCommandClean Condition="$(CMakeCommandClean) == ''">cmake --build $(CMakeBinaryDir) --target clean</CMakeCommandClean>
   </PropertyGroup>
+  <ItemGroup>
+    <CMakeSources Include="$(CMakeSourceDir)/src/*" />
+    <CMakeSources Include="$(CMakeDepsDir)/**/*.h" />
+    <CMakeSources Include="$(CMakeDepsDir)/**/*.hpp" />
+    <CMakeSources Include="$(CMakeDepsDir)/**/*.hxx" />
+    <CMakeSources Include="$(CMakeDepsDir)/**/*.c" />
+    <CMakeSources Include="$(CMakeDepsDir)/**/*.cpp" />
+    <CMakeSources Include="$(CMakeDepsDir)/**/*.cxx" />
+    <CMakeBinaries Include="$(CMakeBinaryDir)/lib/$(CbPluginBinary)" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CMake" Version="3.5.2" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
@@ -54,42 +68,80 @@
     <MakeDir Directories="$(SolutionDir)/packages" />
   </Target>
 
-  <Target Name="BuildNativeLibrary"
-    Condition="$(BuildNativeLibrary) == 'true'"
-    BeforeTargets="Build">
-    <MakeDir Directories="$(CMakeBinaries)" />
-    <Message Text="CMake: Configuring ==============================================================" Importance="high"/>
-    <Message Text="       Platform: $(OS) $(PlatformTarget)" Importance="high"/>
-    <Message Text="      Generator: $(CMakeGenerator)" Importance="high"/>
-    <Message Condition="$(OS) != 'Windows_NT'" Text="  Configuration: $(CMakeConfig)" Importance="high"/>
+  <Target Name="CMakeClean" BeforeTargets="Clean">
+    <Message Text="CMake: Cleanining ==============================================================" Importance="high" />
     <Exec
-      Command="$(CMakeCmdConfig)"
-      WorkingDirectory="$(CMakeBinaries)"
-      ConsoleToMSBuild="true"
-      CustomWarningRegularExpression="([Ww]arning|Built target)">
+      Command="$(CMakeCommandClean)"
+      WorkingDirectory="$(CMakeBinaryDir)"
+      ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-    <Message Text="CMake: Configure complete" Importance="high"/>
-    <Message Text="" Importance="high"/>
-
-    <Message Text="CMake: Building with $(CMakeParallelCount) parallel cores" Importance="high"/>
-    <Exec
-      Command="$(CMakeCmdBuild)"
-      WorkingDirectory="$(CMakeBinaries)"
-      ConsoleToMSBuild="true"
-      CustomWarningRegularExpression="([Ww]arning|Built target)">
-      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
-    </Exec>
-    <Message Text="CMake: Build complete" Importance="high"/>
+    <!-- TODO <OnError ExecuteTargets="CMakeCleanFailed" /> -->
   </Target>
 
-  <Target Name="EmbedNativeLibraries"
+  <Target Name="CMakeDeepClean">
+    <Message Text="CMake: Deep Cleanining =========================================================" Importance="high" />
+    <RemoveDir Directories="$(CMakeDepsDir)" />
+    <RemoveDir Directories="$(CMakeBinaryDir)" />
+
+    <!-- TODO <OnError ExecuteTargets="CMakeDeepCleanFailed" /> -->
+  </Target>
+
+  <Target Name="CMakeConfigure"
+    Inputs="@(CMakeSources)"
+    Outputs="@(CMakeBinaries)"
+    Condition="$(BuildNativeLibrary) == 'true'"
+    BeforeTargets="Build;VSTest">
+    <MakeDir Directories="$(CMakeDepsDir)" />
+    <MakeDir Directories="$(CMakeBinaryDir)" />
+    <Message Text="CMake: Configuring =============================================================" Importance="high" />
+    <Message Text="  Configuration: $(CMakeBuildType)" Importance="high" />
+    <Message Text="       Platform: $(OS) $(PlatformTarget)" Importance="high" />
+    <Message Text="      Generator: $(CMakeGenerator)" Importance="high" />
+    <Message Text="       Parallel: $(CMakeGenerator)" Importance="high" />
+    <Message Text="       CbSlnDir: $(CbSlnDir)" Importance="high" />
+    <Message Text="       CbSdkDir: $(CbSdkDir)" Importance="high" />
+    <Message Text=" PluginFullPath: $(PluginFullPath)" Importance="high" />
+    <Message Text="DefineConstants: $(DefineConstants)" Importance="high" />
+    <Message Text="        Command:" Importance="high" />
+    <Message Text="$(CMakeCommandConfig)" Importance="high" />
+    <Message Text="================================================================================" Importance="high" />
+    <Exec
+      Command="$(CMakeCommandConfig)"
+      WorkingDirectory="$(CMakeBinaryDir)"
+      ConsoleToMSBuild="true"
+      CustomWarningRegularExpression="([Ww]arning|Built target)">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+    </Exec>
+    <!-- TODO <OnError ExecuteTargets="CMakeConfigureFailed" /> -->
+  </Target>
+
+  <Target Name="CMakeBuild"
+    Inputs="@(CMakeSources)"
+    Outputs="@(CMakeBinaries)"
+    Condition="$(BuildNativeLibrary) == 'true'"
+    BeforeTargets="Build;VSTest"
+    AfterTargets="CMakeConfigure">
+    <Message Text="CMake: Building with $(CMakeCoreCount) parallel cores =========================================" Importance="high" />
+    <Message Text="$(CMakeCommandBuild)" Importance="high" />
+    <Message Text="================================================================================" Importance="high" />
+    <Exec
+      Command="$(CMakeCommandBuild)"
+      WorkingDirectory="$(CMakeBinaryDir)"
+      ConsoleToMSBuild="true"
+      CustomWarningRegularExpression="([Ww]arning|Built target)">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+    </Exec>
+    <!-- TODO <OnError ExecuteTargets="CMakeBuildFailed" /> -->
+  </Target>
+
+  <Target Name="CMakeEmbed"
     BeforeTargets="Build"
-    AfterTargets="BuildNativeLibrary">
+    AfterTargets="CMakeBuild">
     <ItemGroup>
-      <EmbeddedResource Include="$(CMakeBinaries)/lib/*aws-crt-dotnet*" Exclude="**/*.ilk" />
+      <EmbeddedResource Include="$(CMakeBinaryDir)/lib/*aws-crt-dotnet*" Exclude="**/*.ilk" />
     </ItemGroup>
-    <Message Text="Embedded library: %(EmbeddedResource.Identity)" Importance="High"/>
+    <Message Text="Embedded library: %(EmbeddedResource.Identity)" Importance="High" />
   </Target>
 
 </Project>
