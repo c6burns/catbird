@@ -6,6 +6,11 @@ set(CB_BINDIR ${CMAKE_CURRENT_BINARY_DIR})
 set(CB_DEPDIR ${CB_SRCDIR}/../deps)
 set(CB_DEPDIR_BIN ${CB_BINDIR}/deps)
 set(CB_GIT_PROTO "https" CACHE STRING "Determines which transport git will use to pull dependencies")
+set(CB_PLUGIN_PREFIX_OVERRIDE "" CACHE STRING "Prefix string for the outputted plugin binary")
+set(CB_PLUGIN_NAME_OVERRIDE "" CACHE STRING "Name string for the outputted plugin binary")
+set(CB_PLUGIN_SUFFIX_OVERRIDE "" CACHE STRING "Suffix string for the outputted plugin binary")
+
+mark_as_advanced(CB_PLUGIN_PREFIX_OVERRIDE CB_PLUGIN_NAME_OVERRIDE CB_PLUGIN_SUFFIX_OVERRIDE)
 
 option(CB_BUILD_DEPS "Builds runtime dependencies as part of this project's build" ON)
 option(CB_BUILD_DEPS_AWS "Builds aws-c-* runtime dependencies as part of this project's build" ON)
@@ -130,8 +135,19 @@ else()
     set(TARGET_ARCH "x86")
 endif()
 
+if (NOT CB_PLUGIN_PREFIX STREQUAL "")
+    set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_LIBRARY_PREFIX ${CB_PLUGIN_PREFIX})
+endif()
+
+if (NOT CB_PLUGIN_NAME_OVERRIDE STREQUAL "")
+    set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_NAME ${CB_PLUGIN_PREFIX})
+endif()
+
+if (NOT CB_PLUGIN_SUFFIX_OVERRIDE STREQUAL "")
+    set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_LIBRARY_PREFIX ${CB_PLUGIN_PREFIX})
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${TARGET_ARCH}")
 # for non-msvc, library output will control the shared lib output
 set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${TARGET_LIB_DIR})
 # for msvc, runtime controls where dlls are output
