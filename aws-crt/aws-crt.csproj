@@ -10,7 +10,7 @@
     <BuildNativeLibrary>true</BuildNativeLibrary>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>$(ProjectDir)../packages</PackageOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)../packages</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <RestoreIgnoreFailedSource>true</RestoreIgnoreFailedSource>
@@ -34,14 +34,14 @@
     <CMakeGenerator Condition="$(CMakeGenerator) == '' AND $(OS) == 'Unix'">Unix Makefiles</CMakeGenerator>
     <CMakeArch Condition="$(CMakeGenerator) == 'Visual Studio 16 2019'">-A x64</CMakeArch>
     <CMakeBinaries Condition="$(OS) == 'Windows_NT'">c:/build-$(MSBuildProjectName)</CMakeBinaries>
-    <CMakeBinaries Condition="$(OS) != 'Windows_NT'">$(ProjectDir)../build</CMakeBinaries>
+    <CMakeBinaries Condition="$(OS) != 'Windows_NT'">$(MSBuildThisFileDirectory)../build</CMakeBinaries>
     <CMakeConfig Condition="$(Configuration) == 'Debug'">Debug</CMakeConfig>
     <CMakeConfig Condition="$(CMakeConfig) == ''">RelWithDebInfo</CMakeConfig>
     <CMakeLibCrypto Condition="$(LibCryptoPath) != ''">-DLibCrypto_INCLUDE_DIR=$(LibCryptoPath)/include -DLibCrypto_STATIC_LIBRARY=$(LibCryptoPath)/lib/libcrypto.a</CMakeLibCrypto>
     <CMakeParallelCount Condition="$(CMakeParallelCount) == ''">$([System.Environment]::ProcessorCount)</CMakeParallelCount>
     <CMakeParallelSwitch Condition="$(OS) == 'Windows_NT'">/nologo /maxcpucount</CMakeParallelSwitch>
     <CMakeParallelSwitch Condition="$(OS) != 'Windows_NT'">-j$(CMakeParallelCount)</CMakeParallelSwitch>
-    <CMakeCmdConfig>cmake -G&quot;$(CMakeGenerator)&quot; -DCMAKE_BUILD_TYPE=$(CMakeConfig) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMakeArch) $(CMakeLibCrypto) $(ProjectDir)../native</CMakeCmdConfig>
+    <CMakeCmdConfig>cmake -G&quot;$(CMakeGenerator)&quot; -DCMAKE_BUILD_TYPE=$(CMakeConfig) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMakeArch) $(CMakeLibCrypto) $(MSBuildThisFileDirectory)../native</CMakeCmdConfig>
     <CMakeCmdBuild>cmake --build . --config $(CMakeConfig) -- $(CMakeParallelSwitch)</CMakeCmdBuild>
   </PropertyGroup>
   <ItemGroup>

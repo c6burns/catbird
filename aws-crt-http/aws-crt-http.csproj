@@ -5,7 +5,7 @@
     <RootNamespace>Aws.Crt.Http</RootNamespace>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>$(ProjectDir)../packages</PackageOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)../packages</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
