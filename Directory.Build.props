@@ -1,14 +1,19 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
-        <SlnDir Condition="$(SlnDir) == ''">$(MSBuildThisFileDirectory)</SlnDir>
-        <!-- <SlnDir Condition="!HasTrailingSlash($(SlnDir))">$(SlnDir)/</SlnDir> -->
-        <SdkDir Condition="$(SdkDir) == ''">$(MSBuildExtensionsPath)</SdkDir>
-        <!-- <SdkDir Condition="!HasTrailingSlash($(SdkDir))">$(SdkDir)/</SdkDir> -->
+        <CbSlnDir Condition="$(CbSlnDir) == ''">$(MSBuildThisFileDirectory)</CbSlnDir>
+        <CbSlnDir Condition="!HasTrailingSlash($(CbSlnDir))">$(CbSlnDir)/</CbSlnDir>
+        <CbSdkDir Condition="$(CbSdkDir) == ''">$(MSBuildExtensionsPath)</CbSdkDir>
+        <CbSdkDir Condition="!HasTrailingSlash($(CbSdkDir))">$(CbSdkDir)/</CbSdkDir>
 
-        <DefineConstants Condition="$(OS) == 'Windows_NT'">$(DefineConstants);CB_PLATFORM_WINDOWS;CB_SOCKAPI_WINSOCK</DefineConstants>
-        <DefineConstants Condition="$(OS) == 'Unix'">$(DefineConstants);CB_PLATFORM_WINDOWS;CB_SOCKAPI_POSIX</DefineConstants>
-        <DefineConstants Condition="$(OS) == 'OSX'">$(DefineConstants);CB_PLATFORM_WINDOWS;CB_SOCKAPI_POSIX</DefineConstants>
+        <CbPlatform Condition="$(CbPlatform) == '' AND $(OS) == 'Windows_NT'">WIN</CbPlatform>
+        <CbPlatform Condition="$(CbPlatform) == '' AND $(OS) == 'Unix'">LIN</CbPlatform>
+        <CbPlatform Condition="$(CbPlatform) == '' AND $(OS) == 'OSX'">OSX</CbPlatform>
+        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) == 'Windows_NT'">WINSOCK</CbSockApi>
+        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) == 'Unix'">POSIX</CbSockApi>
+        <CbSockApi Condition="$(CbSockApi) == '' AND $(OS) == 'OSX'">POSIX</CbSockApi>
+        <DefineConstants Condition="$(DefineConstants) != '' AND !$(DefineConstants.EndsWith(';'))">$(DefineConstants);</DefineConstants>
+        <DefineConstants>$(DefineConstants)CB_PLATFORM_$(CbPlatform);CB_SOCKAPI_$(CbSockApi)</DefineConstants>
 
         <PluginDir Condition="$(PluginDir) == ''">$(SlnDir)UnityProject/Assets/catbird/Plugins/</PluginDir>
         <PluginArchDir Condition="$(PluginArchDir) == ''">x86_64/</PluginArchDir>
