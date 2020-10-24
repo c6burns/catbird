@@ -103,7 +103,7 @@
     BeforeTargets="Build;VSTest">
     <MakeDir Directories="$(CMakeDepsDir)" />
     <MakeDir Directories="$(CMakeBinaryDir)" />
-    <Message Text="CMake: Configuring =============================================================" Importance="high" />
+    <Message Text="CMake: Build environment =======================================================" Importance="high" />
     <Message Text="  Configuration: $(CMakeBuildType)" Importance="high" />
     <Message Text="       Platform: $(OS) $(PlatformTarget)" Importance="high" />
     <Message Text="      Generator: $(CMakeGenerator)" Importance="high" />
@@ -112,7 +112,7 @@
     <Message Text="       CbSdkDir: $(CbSdkDir)" Importance="high" />
     <Message Text=" PluginFullPath: $(PluginFullPath)" Importance="high" />
     <Message Text="DefineConstants: $(DefineConstants)" Importance="high" />
-    <Message Text="        Command:" Importance="high" />
+    <Message Text="CMake: Configuring =============================================================" Importance="high" />
     <Message Text="$(CMakeCommandConfig)" Importance="high" />
     <Message Text="================================================================================" Importance="high" />
     <Exec
