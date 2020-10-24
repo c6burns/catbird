@@ -86,23 +86,23 @@
       ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-    <!-- TODO <OnError ExecuteTargets="CMakeCleanFailed" /> -->
   </Target>
 
   <Target Name="CMakeDeepClean">
     <Message Text="CMake: Deep Cleanining =========================================================" Importance="high" />
-    <RemoveDir Directories="$(CMakeDepsDir)" />
-    <RemoveDir Directories="$(CMakeBinaryDir)" />
+    <RemoveDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
+    <MakeDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
+  </Target>
 
-    <!-- TODO <OnError ExecuteTargets="CMakeDeepCleanFailed" /> -->
+  <Target Name="CMakePrepare" BeforeTargets="Build">
+    <MakeDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
   </Target>
 
   <Target Name="CMakeConfigure" Condition="$(CbPluginNativeBuild) == 'true'"
     Inputs="@(CMakeSources)"
     Outputs="@(CMakeBinaries)"
-    BeforeTargets="Build;VSTest">
-    <MakeDir Directories="$(CMakeDepsDir)" />
-    <MakeDir Directories="$(CMakeBinaryDir)" />
+    BeforeTargets="Build;VSTest"
+    AfterTargets="CMakePrepare">
     <Message Text="CMake: Build environment =======================================================" Importance="high" />
     <Message Text="  Configuration: $(CMakeBuildType)" Importance="high" />
     <Message Text="       Platform: $(OS) $(PlatformTarget)" Importance="high" />
