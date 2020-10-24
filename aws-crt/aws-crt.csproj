@@ -79,7 +79,7 @@
   </Target>
 
   <Target Name="CMakeClean" Condition="$(CbPluginNativeBuild) == 'true'" BeforeTargets="Clean">
-    <Message Text="CMake: Cleanining ==============================================================" Importance="high" />
+    <Message Text="CMake: Cleaning ================================================================" Importance="high" />
     <Message Text="$(CMakeCommandClean)" Importance="high" />
     <Message Text="================================================================================" Importance="high" />
     <Exec Condition="Exists('$(CMakeBinaryDir)/CMakeCache.txt')"
@@ -90,8 +90,8 @@
     </Exec>
   </Target>
 
-  <Target Name="CMakeDeepClean">
-    <Message Text="CMake: Deep Cleanining =========================================================" Importance="high" />
+  <Target Name="CMakeClense">
+    <Warning Text="CMake: Deep clensing with scrubby bubbles ... hya!!! ∘˚˳°∘°(˘▼˘ )∘˚˳°∘°" />
     <RemoveDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
     <MakeDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
     <CallTarget Targets="Clean"/>
