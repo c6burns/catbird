@@ -80,7 +80,9 @@
 
   <Target Name="CMakeClean" Condition="$(CbPluginNativeBuild) == 'true'" BeforeTargets="Clean">
     <Message Text="CMake: Cleanining ==============================================================" Importance="high" />
-    <Exec
+    <Message Text="$(CMakeCommandClean)" Importance="high" />
+    <Message Text="================================================================================" Importance="high" />
+    <Exec Condition="Exists('$(CMakeBinaryDir)/CMakeCache.txt')"
       Command="$(CMakeCommandClean)"
       WorkingDirectory="$(CMakeBinaryDir)"
       ConsoleToMSBuild="true">
@@ -92,6 +94,7 @@
     <Message Text="CMake: Deep Cleanining =========================================================" Importance="high" />
     <RemoveDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
     <MakeDir Directories="$(CMakeDepsDir);$(CMakeBinaryDir)" />
+    <CallTarget Targets="Clean"/>
   </Target>
 
   <Target Name="CMakePrepare" BeforeTargets="Build">
