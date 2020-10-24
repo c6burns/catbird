@@ -78,7 +78,7 @@
     <MakeDir Directories="$(SolutionDir)/packages" />
   </Target>
 
-  <Target Name="CMakeClean" BeforeTargets="Clean">
+  <Target Name="CMakeClean" Condition="$(CbPluginNativeBuild) == 'true'" BeforeTargets="Clean">
     <Message Text="CMake: Cleanining ==============================================================" Importance="high" />
     <Exec
       Command="$(CMakeCommandClean)"
@@ -97,7 +97,7 @@
     <!-- TODO <OnError ExecuteTargets="CMakeDeepCleanFailed" /> -->
   </Target>
 
-  <Target Name="CMakeConfigure" Condition="$(CbPluginNativeBuild) != 'true'"
+  <Target Name="CMakeConfigure" Condition="$(CbPluginNativeBuild) == 'true'"
     Inputs="@(CMakeSources)"
     Outputs="@(CMakeBinaries)"
     BeforeTargets="Build;VSTest">
@@ -125,7 +125,7 @@
     <!-- TODO <OnError ExecuteTargets="CMakeConfigureFailed" /> -->
   </Target>
 
-  <Target Name="CMakeBuild" Condition="$(CbPluginNativeBuild) != 'true'"
+  <Target Name="CMakeBuild" Condition="$(CbPluginNativeBuild) == 'true'"
     Inputs="@(CMakeSources)"
     Outputs="@(CMakeBinaries)"
     BeforeTargets="Build;VSTest"
@@ -143,7 +143,7 @@
     <!-- TODO <OnError ExecuteTargets="CMakeBuildFailed" /> -->
   </Target>
 
-  <Target Name="CMakeEmbed"
+  <Target Name="CMakeEmbed" Condition="$(CbPluginNativeBuild) == 'true'"
     BeforeTargets="Build"
     AfterTargets="CMakeBuild">
     <ItemGroup>
