@@ -34,6 +34,9 @@ macro(cb_add_git_dependency)
     add_subdirectory(${CB_DEPDIR}/${ARGV0} ${CB_DEPDIR_BIN}/${ARGV0})
 endmacro()
 
+if (POLICY CMP0069)
+    cmake_policy(SET CMP0048 NEW) # VERSION not allowed unless CMP0048 is set to NEW
+endif()
 
 if (POLICY CMP0069)
     cmake_policy(SET CMP0069 NEW) # Enable LTO/IPO if available in the compiler, see AwsCFlags
@@ -101,10 +104,11 @@ if (CB_BUILD_DEPS)
 
     # build wxWidgets dependencies
     if (CB_BUILD_DEPS_WX)
-#        set(wxBUILD_SHARED OFF)
+        set(wxBUILD_SHARED OFF)
         #set(wxBUILD_USE_STATIC_RUNTIME ON)
         #set(wxBUILD_MONOLITHIC ON)
- #       set(wxUSE_NO_RTTI ON)
+        #set(wxUSE_NO_RTTI ON)
+        set(wxBUILD_PRECOMP OFF)
         cb_add_git_dependency(wxWidgets)
     endif()
 else()
